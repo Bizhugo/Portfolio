@@ -270,7 +270,7 @@ function StackCard({ t }: { t: Theme }) {
     { label:"Design",     icon:<Star size={14}/>,       items:["Figma","Framer","shadcn/ui","Stripe"] },
   ];
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 mt-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 mt-3">
       {cats.map(cat => (
         <div key={cat.label} className="rounded-xl p-4" style={{ background: t.cardBg, border: `1px solid ${t.border}` }}>
           <div className="flex items-center gap-2 mb-3" style={{ color: t.faint }}>
@@ -639,6 +639,14 @@ export default function Portfolio() {
           0%, 80%, 100% { opacity:.3; transform:scale(.8); }
           40%            { opacity:1;  transform:scale(1);  }
         }
+        .portfolio-root { height: 100dvh; }
+        @supports not (height: 100dvh) { .portfolio-root { height: 100vh; } }
+        .bottom-bar-safe { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+        @media (max-width: 767px) {
+          .quick-arrow { opacity: 1 !important; }
+          .chips-scroll { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+          .chips-scroll::-webkit-scrollbar { display: none; }
+        }
       `}</style>
  
       {/* Mobile drawer */}
@@ -648,7 +656,7 @@ export default function Portfolio() {
         onAsk={handleAsk} isTyping={isTyping} isStreaming={isStreaming} t={t}
       />
  
-      <div className="flex h-screen overflow-hidden" style={{ background: t.bg, color: t.text, fontFamily: "sans-serif" }}>
+      <div className="portfolio-root flex overflow-hidden" style={{ background: t.bg, color: t.text, fontFamily: "sans-serif" }}>
  
         {/* ── SIDEBAR (desktop only) ── */}
         <aside className="w-[260px] hidden md:flex flex-col shrink-0 transition-colors duration-200"
@@ -714,18 +722,19 @@ export default function Portfolio() {
             style={{ background: t.bannerBg, color: t.bannerText, borderBottom: `1px solid ${t.bannerBorder}` }}>
  
             {/* Mobile: hamburger left */}
-            <button onClick={() => setDrawerOpen(true)} className="md:hidden absolute left-4 w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: t.surface2, border: `1px solid ${t.border}`, color: t.muted }}>
+            <button onClick={() => setDrawerOpen(true)} className="md:hidden absolute left-3 w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: "transparent", color: t.bannerText }}>
               <Menu size={18} />
             </button>
  
-            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse" />
-            Open to freelance &amp; remote roles worldwide
-            <span className="ml-2" style={{ color: t.blue }}>→</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse hidden md:inline-block" />
+            <span className="hidden md:inline">Open to freelance &amp; remote roles worldwide</span>
+            <span className="md:hidden text-xs font-medium">Open to freelance &amp; remote →</span>
+            <span className="ml-2 hidden md:inline" style={{ color: t.blue }}>→</span>
  
             {/* Mobile: theme toggle right */}
-            <button onClick={() => setIsDark(p => !p)} className="md:hidden absolute right-4 w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: t.surface2, border: `1px solid ${t.border}`, color: t.muted }}>
+            <button onClick={() => setIsDark(p => !p)} className="md:hidden absolute right-3 w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: "transparent", color: t.bannerText }}>
               {isDark ? <Sun size={16}/> : <Moon size={16}/>}
             </button>
           </div>
@@ -773,8 +782,9 @@ export default function Portfolio() {
                 <div className="w-full rounded-2xl p-4 shadow-sm mb-6 z-10 transition-colors duration-200"
                   style={{ background: t.inputBg, border: `1px solid ${t.border}` }}>
                   <input type="text" placeholder="Ask about my projects, stack, or availability..."
-                    className="w-full bg-transparent focus:outline-none px-2 mb-4 text-base"
-                    style={{ color: t.text }}
+                    className="w-full bg-transparent focus:outline-none px-2 mb-4"
+                    style={{ color: t.text, fontSize: "16px" }}
+                    inputMode="text"
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && handleSubmit()}
@@ -795,10 +805,10 @@ export default function Portfolio() {
                 </div>
  
                 {/* Chips */}
-                <div className="flex flex-wrap gap-2 mb-8 justify-center z-10">
+                <div className="chips-scroll flex flex-wrap gap-2 mb-8 justify-center z-10 w-full">
                   {chips.map(chip => (
                     <button key={chip.key} onClick={() => handleAsk(chip.key)}
-                      className="px-4 py-2 text-sm rounded-full transition-all"
+                      className="px-4 py-2 text-sm rounded-full transition-all shrink-0"
                       style={{ color: t.muted, border: `1px solid ${t.chipBorder}` }}
                       onMouseEnter={e => { e.currentTarget.style.background = t.surface2; e.currentTarget.style.color = t.text; e.currentTarget.style.borderColor = t.border2; }}
                       onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = t.muted; e.currentTarget.style.borderColor = t.chipBorder; }}>
@@ -821,7 +831,7 @@ export default function Portfolio() {
                       onMouseEnter={e => e.currentTarget.style.color = t.text}
                       onMouseLeave={e => e.currentTarget.style.color = t.faint}>
                       <span>{q.text}</span>
-                      <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-3"/>
+                      <ArrowRight size={14} className="quick-arrow opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-3"/>
                     </button>
                   ))}
                 </div>
@@ -830,7 +840,7 @@ export default function Portfolio() {
             ) : (
  
               /* ── CHAT THREAD ── */
-              <div className="w-full max-w-2xl mx-auto px-5 pt-10 pb-52 space-y-10">
+              <div className="w-full max-w-2xl mx-auto px-5 pt-10 pb-44 space-y-10">
                 {messages.map((msg, idx) => (
                   <MessageRow key={msg.id} msg={msg}
                     isLast={idx === messages.length - 1}
@@ -846,15 +856,15 @@ export default function Portfolio() {
  
           {/* ── BOTTOM INPUT (chat mode) ── */}
           {hasStarted && (
-            <div className="absolute bottom-0 left-0 w-full px-5 pb-6 pt-6"
+            <div className="bottom-bar-safe absolute bottom-0 left-0 w-full px-5 pt-6"
               style={{ background: `linear-gradient(to top, ${t.bg} 60%, transparent)` }}>
               <div className="max-w-2xl mx-auto space-y-3">
                 {chips.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="chips-scroll flex gap-2 flex-wrap">
                     {chips.slice(0,4).map(chip => (
                       <button key={chip.key} onClick={() => handleAsk(chip.key)}
                         disabled={isTyping || isStreaming}
-                        className="px-4 py-1.5 text-sm rounded-full transition-all disabled:opacity-30"
+                        className="px-4 py-1.5 text-sm rounded-full transition-all disabled:opacity-30 shrink-0"
                         style={{ color: t.muted, border: `1px solid ${t.chipBorder}` }}
                         onMouseEnter={e => { e.currentTarget.style.background = t.surface2; e.currentTarget.style.color = t.text; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = t.muted; }}>
@@ -866,8 +876,9 @@ export default function Portfolio() {
                 <div className="w-full rounded-2xl p-3 flex items-center gap-2 transition-colors"
                   style={{ background: t.inputBg, border: `1px solid ${t.border}` }}>
                   <input type="text" placeholder="Ask follow-up... (try /sudo)"
-                    className="bg-transparent w-full focus:outline-none px-2 text-base"
-                    style={{ color: t.text }}
+                    className="bg-transparent w-full focus:outline-none px-2"
+                    style={{ color: t.text, fontSize: "16px" }}
+                    inputMode="text"
                     value={inputValue}
                     onChange={e => setInputValue(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && handleSubmit()}
@@ -887,5 +898,4 @@ export default function Portfolio() {
       </div>
     </>
   );
-} 
-
+}
